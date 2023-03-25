@@ -1,0 +1,4 @@
+surrealdb
+discordpy
+python-dotenv
+requests

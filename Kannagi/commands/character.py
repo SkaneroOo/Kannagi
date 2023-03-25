@@ -15,14 +15,15 @@ class Character(Cog):
 
     def __init__(self, bot: Kannagi):
         self.bot: Kannagi = bot
+        self.translate = self.bot.tree.translator.sync_translate
         self.logger = Logger(__name__)
-        self.logger.info("Successfully loaded ping command")
+        self.logger.info("Successfully loaded character commands")
 
     @app_commands.command()
     async def character(self, interaction: Interaction, character_id: int):
         data = await self.bot.database.execute(f"SELECT name, image FROM characters:{character_id};")
         if not data:
-            embed = Embed(title="Character not found")
+            embed = Embed(title=self.translate("char_not_found", interaction.locale))
             embed.color = 0xff0000
             await interaction.response.send_message(embed=embed)
             self.logger.debug(f"Character with id {character_id} not found")
@@ -41,7 +42,7 @@ class Character(Cog):
         self.logger.debug(character)
         data = await self.bot.database.execute(f"SELECT name, image FROM {character};")
         if not data:
-            embed = Embed(title="Character not found")
+            embed = Embed(title=self.translate("char_not_found", interaction.locale))
             embed.color = 0xff0000
             await interaction.response.send_message(embed=embed)
             self.logger.debug(f"Character with id {character} not found")

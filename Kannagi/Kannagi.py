@@ -20,12 +20,12 @@ class Kannagi(AutoShardedBot):
         # self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self):
+        await self.tree.set_translator(Translator(self.translations_path))
+        await self.load_extension("Kannagi.commands")
         self.tree.copy_global_to(guild=GUILD)
         data = await self.database.execute("INFO FOR DB;")
         if data:
             self.logger.info("Successfully connected to database")
-        await self.tree.set_translator(Translator(self.translations_path))
         self.logger.info("Successfully initialised translator")
-        await self.load_extension("Kannagi.commands")
         await self.tree.sync()
         

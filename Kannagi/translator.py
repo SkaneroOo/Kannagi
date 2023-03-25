@@ -19,7 +19,15 @@ class Translator(Tr):
     async def translate(self, string: locale_str, locale: Locale, context: TranslationContextTypes) -> str | None:
         if locale.value[:2] in self.translations:
             return self.translations[locale.value[:2]].get(string.message, None)
-        return None
+        return self.translations["en"].get(string.message, None)
+    
+    def sync_translate(self, string: str, locale: Locale) -> str:
+        ret_value: str | None = None
+        if locale.value[:2] in self.translations:
+            ret_value = self.translations[locale.value[:2]].get(string, None)
+        if ret_value is None:
+            ret_value = self.translations["en"].get(string, "No translation available")
+        return ret_value
     
     async def load(self) -> None:
         for file in os.listdir(self.translations_path):

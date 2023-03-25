@@ -1,3 +1,19 @@
 {
-    "ping": "ping"
+    "ping": "ping",
+    "register": "register",
+    "register_description": "Register your profile",
+    "register_success": "Successfully created your profile. Now you can start your new adventure.",
+    "register_profile_exist": "You already have a profile",
+    "char_not_found": "Character not found",
+    "user_no_profile": "Selected user doesn't have profile.",
+    "user_self_no_profile": "You don't have profile yet.\nTo start your adventure use command `/register`",
+    "profile": "profile",
+    "profile_description": "Show user's profile",
+    "profile_title": "{}'s profile",
+    "profile_balance": "Balance:",
+    "profile_level": "Level:",
+    "profile_xp": "XP:",
+    "profile_fav": "Favorite character:",
+    "profile_daily_time": "Time until next daily:",
+    "profile_daily_ready": "You can claim your daily"
 }
