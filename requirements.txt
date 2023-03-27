@@ -1,4 +1,5 @@
 surrealdb
-discordpy
+discord.py
 python-dotenv
 requests
+pillow

@@ -1,6 +1,7 @@
 from discord import Intents, Object
 from discord.ext.commands import AutoShardedBot
 from surrealdb import HTTPClient
+from os import listdir
 
 from .translator import Translator
 from .logger import Logger, LogLevel
@@ -21,7 +22,9 @@ class Kannagi(AutoShardedBot):
 
     async def setup_hook(self):
         await self.tree.set_translator(Translator(self.translations_path))
-        await self.load_extension("Kannagi.commands")
+        for file in listdir("./Kannagi/commands"):
+            if file.endswith(".py"):
+                await self.load_extension(f"Kannagi.commands.{file[:file.index('.')]}")
         self.tree.copy_global_to(guild=GUILD)
         data = await self.database.execute("INFO FOR DB;")
         if data:

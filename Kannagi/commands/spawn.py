@@ -50,7 +50,7 @@ class CardEmbed(Embed):
         super().__init__(*args, **kwargs)
         self.title = interaction.client.tree.translator.sync_translate("new_card_spawn_title", interaction.locale)
         self.description = "**" + card["name"] + "**"
-        self.set_image(url=card["image"])
+        self.set_image(url=f"http://kannagi.rf.gd/cards/{card['id'].split(':')[1]}_0.png")
         self.color = 0x0000ff
         # self.set_thumbnail(url = interaction.client.user.avatar.url)
 
@@ -81,3 +81,7 @@ class Spawn(Cog):
         view = CardView(self.bot, card)
         embed = CardEmbed(interaction, card)
         await interaction.response.send_message(embed=embed, view=view)
+
+        
+async def setup(bot: Kannagi):
+    await bot.add_cog(Spawn(bot))

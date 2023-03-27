@@ -12,12 +12,15 @@ class Admin(Cog):
         self.logger.info("Successfully loaded admin utilities")
 
     @app_commands.command()
-    async def reload(self, interaction: Interaction):
+    async def reload(self, interaction: Interaction, module: str):
         if interaction.user.id != 215553356452724747:
             await interaction.response.send_message("You cannot use that command")
             return
-        self.logger.info("Reloading all commands")
-        await self.bot.reload_extension("Kannagi.commands")
-        await self.bot.tree.sync()
-        await interaction.response.send_message("Commands reloaded", ephemeral=True)
-        self.logger.info("Reloaded all commands")
+        self.logger.info(f"Reloading {module} module")
+        await self.bot.reload_extension(f"Kannagi.commands.{module}")
+        await interaction.response.send_message(f"Module {module} reloaded", ephemeral=True)
+        self.logger.info(f"Reloaded {module} module")
+
+        
+async def setup(bot: Kannagi):
+    await bot.add_cog(Admin(bot))

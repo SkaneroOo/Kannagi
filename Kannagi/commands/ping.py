@@ -16,3 +16,7 @@ class Ping(Cog):
     async def ping(self, interaction: Interaction):
         await interaction.response.send_message(f"Pong {int(self.bot.latency*1000)}ms")
         self.logger.info("Pinging")
+
+
+async def setup(bot: Kannagi):
+    await bot.add_cog(Ping(bot))

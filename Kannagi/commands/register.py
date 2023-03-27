@@ -20,3 +20,7 @@ class Register(Cog):
             return
         await self.bot.database.execute(f"INSERT INTO profiles (id, balance, xp, fav, color) VALUES ({interaction.user.id}, 0, 0, null, 6710886);")
         await interaction.response.send_message(self.translate("register_success", interaction.locale))
+
+        
+async def setup(bot: Kannagi):
+    await bot.add_cog(Register(bot))

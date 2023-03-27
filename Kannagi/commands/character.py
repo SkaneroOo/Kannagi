@@ -21,7 +21,7 @@ class Character(Cog):
 
     @app_commands.command()
     async def character(self, interaction: Interaction, character_id: int):
-        data = await self.bot.database.execute(f"SELECT name, image FROM characters:{character_id};")
+        data = await self.bot.database.execute(f"SELECT name, id FROM characters:{character_id};")
         if not data:
             embed = Embed(title=self.translate("char_not_found", interaction.locale))
             embed.color = 0xff0000
@@ -30,7 +30,7 @@ class Character(Cog):
             return
         data = data[0]
         embed = Embed(title=data["name"])
-        embed.set_image(url=data["image"])
+        embed.set_image(url=f"http://kannagi.rf.gd/cards/{data['id'].split(':')[1]}_6.png")
         embed.set_footer(text=f"AniList ID: {character_id}")
         embed.color = 0x00ff00
         await interaction.response.send_message(embed=embed)
@@ -40,7 +40,7 @@ class Character(Cog):
     @app_commands.autocomplete(character=character_autocomplete)
     async def character_name(self, interaction: Interaction, character: str):
         self.logger.debug(character)
-        data = await self.bot.database.execute(f"SELECT name, image FROM {character};")
+        data = await self.bot.database.execute(f"SELECT name, id FROM {character};")
         if not data:
             embed = Embed(title=self.translate("char_not_found", interaction.locale))
             embed.color = 0xff0000
@@ -49,8 +49,11 @@ class Character(Cog):
             return
         data = data[0]
         embed = Embed(title=data["name"])
-        embed.set_image(url=data["image"])
+        embed.set_image(url=f"http://kannagi.rf.gd/cards/{data['id'].split(':')[1]}_6.png")
         embed.set_footer(text=f"AniList ID: {character.split(':')[1]}")
         embed.color = 0x00ff00
         await interaction.response.send_message(embed=embed)
         self.logger.debug(f"Character {data['name']} found")
+
+async def setup(bot: Kannagi):
+    await bot.add_cog(Character(bot))

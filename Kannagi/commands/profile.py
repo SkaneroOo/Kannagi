@@ -47,7 +47,7 @@ class Profile(Cog):
         embed.color = data["color"]
         if data["fav"]:
             embed.add_field(name=self.translate("profile_fav", interaction.locale), value=data["fav"]["name"], inline=False)
-            embed.set_image(url=data["fav"]["image"])
+            embed.set_image(url=f"http://kannagi.rf.gd/cards/{data['fav']['id'].split(':')[1]}_6.png")
         await interaction.response.send_message(embed=embed)
 
     async def menu_profile(self, interaction: Interaction, user: Member):
@@ -59,20 +59,26 @@ class Profile(Cog):
             await interaction.response.send_message(message, ephemeral=True)
             return
         data = data[0]
-        embed = Embed(title=(self.translate("profile_title", interaction.locale)).format(user.display_name))
+        data["daily"] = datetime.fromisoformat(data["daily"])
+        embed = Embed(title=self.translate("profile_title", interaction.locale).format(user.display_name))
         embed.set_thumbnail(url=user.avatar.url)
         embed.add_field(name=self.translate("profile_balance", interaction.locale), value=data["balance"])
         level, xp = self.calculate_level(data["xp"])
         embed.add_field(name=self.translate("profile_level", interaction.locale), value=level)
         embed.add_field(name=self.translate("profile_xp", interaction.locale), value=xp)
-        embed.add_field(name=self.translate("profile_inventory", interaction.locale), value=data["inventoty_slots"])
+        if data["daily"] < datetime.now(timezone.utc):
+            embed.add_field(name=self.translate("profile_daily_time", interaction.locale), value=self.translate("profile_daily_ready", interaction.locale))
+        else:
+            embed.add_field(name=self.translate("profile_daily_time", interaction.locale), value=f"<t:{int(data['daily'].timestamp())}:R>")
         embed.color = data["color"]
         if data["fav"]:
             embed.add_field(name=self.translate("profile_fav", interaction.locale), value=data["fav"]["name"], inline=False)
-            embed.set_image(url=data["fav"]["image"])
+            embed.set_image(url=f"http://kannagi.rf.gd/cards/{data['fav']['id'].split(':')[1]}_6.png")
         await interaction.response.send_message(embed=embed)
 
     def calculate_level(self, xp: int) -> tuple[int, int]:
         return 1, 0 #TODO
 
         
+async def setup(bot: Kannagi):
+    await bot.add_cog(Profile(bot))
