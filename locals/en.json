@@ -15,5 +15,9 @@
     "profile_xp": "XP:",
     "profile_fav": "Favorite character:",
     "profile_daily_time": "Time until next daily:",
-    "profile_daily_ready": "You can claim your daily"
+    "profile_daily_ready": "You can claim your daily",
+    "cannot_summon_yet": "Sorry, you can't summon yet. You can summon next card <t:{}:R>",
+    "no_inventory_space": "You don't have any empty slots in your inventory. Free some space or buy inventory expansion to be able to claim more characters.",
+    "new_card_spawn_title": "New card appeared",
+    "card_claimed": "Claimed by {}"
 }

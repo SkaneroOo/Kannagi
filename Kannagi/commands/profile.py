@@ -1,6 +1,6 @@
 from discord.ext.commands import Cog
 from discord import Interaction, app_commands, Member, Embed
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from Kannagi.logger import Logger
 from Kannagi import Kannagi
