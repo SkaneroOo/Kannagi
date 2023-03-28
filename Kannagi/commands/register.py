@@ -18,7 +18,7 @@ class Register(Cog):
         if data:
             await interaction.response.send_message(self.translate("register_profile_exist", interaction.locale), ephemeral=True)
             return
-        await self.bot.database.execute(f"INSERT INTO profiles (id, balance, xp, fav, color, inventory_slots, summon, daily) VALUES ({interaction.user.id}, 0, 0, null, 6710886, 25, time::now() - 5m, '2023-03-20');")
+        await self.bot.database.execute(f"INSERT INTO profiles (id, balance, xp, fav, color, inventory_slots, summon, daily) VALUES ({interaction.user.id}, 0, 0, null, 6710886, 25, time::now() - 5m, time::group(time::now(), 'day'));")
         await interaction.response.send_message(self.translate("register_success", interaction.locale))
 
 

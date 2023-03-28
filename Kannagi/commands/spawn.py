@@ -50,7 +50,7 @@ class CardEmbed(Embed):
         super().__init__(*args, **kwargs)
         self.title = interaction.client.tree.translator.sync_translate("new_card_spawn_title", interaction.locale)
         self.description = "**" + card["name"] + "**"
-        self.set_image(url=f"http://kannagi.rf.gd/cards/{card['id'].split(':')[1]}_0.png")
+        self.set_image(url=f"https://kannagicdn.netlify.app/{card['id'].split(':')[1]}_0.png")
         self.color = 0x0000ff
         # self.set_thumbnail(url = interaction.client.user.avatar.url)
 

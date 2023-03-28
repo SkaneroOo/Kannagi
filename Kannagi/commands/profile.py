@@ -47,7 +47,7 @@ class Profile(Cog):
         embed.color = data["color"]
         if data["fav"]:
             embed.add_field(name=self.translate("profile_fav", interaction.locale), value=data["fav"]["name"], inline=False)
-            embed.set_image(url=f"http://kannagi.rf.gd/cards/{data['fav']['id'].split(':')[1]}_6.png")
+            embed.set_image(url=f"https://kannagicdn.netlify.app/{data['fav']['id'].split(':')[1]}_6.png")
         await interaction.response.send_message(embed=embed)
 
     async def menu_profile(self, interaction: Interaction, user: Member):
@@ -73,7 +73,7 @@ class Profile(Cog):
         embed.color = data["color"]
         if data["fav"]:
             embed.add_field(name=self.translate("profile_fav", interaction.locale), value=data["fav"]["name"], inline=False)
-            embed.set_image(url=f"http://kannagi.rf.gd/cards/{data['fav']['id'].split(':')[1]}_6.png")
+            embed.set_image(url=f"https://kannagicdn.netlify.app/{data['fav']['id'].split(':')[1]}_6.png")
         await interaction.response.send_message(embed=embed)
 
     def calculate_level(self, xp: int) -> tuple[int, int]:

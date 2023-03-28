@@ -30,7 +30,7 @@ class Character(Cog):
             return
         data = data[0]
         embed = Embed(title=data["name"])
-        embed.set_image(url=f"http://kannagi.rf.gd/cards/{data['id'].split(':')[1]}_6.png")
+        embed.set_image(url=f"https://kannagicdn.netlify.app/{data['id'].split(':')[1]}_6.png")
         embed.set_footer(text=f"AniList ID: {character_id}")
         embed.color = 0x00ff00
         await interaction.response.send_message(embed=embed)
@@ -49,7 +49,7 @@ class Character(Cog):
             return
         data = data[0]
         embed = Embed(title=data["name"])
-        embed.set_image(url=f"http://kannagi.rf.gd/cards/{data['id'].split(':')[1]}_6.png")
+        embed.set_image(url=f"https://kannagicdn.netlify.app/{data['id'].split(':')[1]}_6.png")
         embed.set_footer(text=f"AniList ID: {character.split(':')[1]}")
         embed.color = 0x00ff00
         await interaction.response.send_message(embed=embed)
