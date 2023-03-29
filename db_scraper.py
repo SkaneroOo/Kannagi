@@ -1,9 +1,8 @@
-from surrealdb import HTTPClient
-import asyncio
+from Kannagi.Database import Database
 import requests
 import time
 
-connection = HTTPClient("http://localhost:8000", username="root", password="root", namespace="Kannagi", database="KannagiDB")
+connection = Database("localhost", user="root", passwd="12345678")
 API_URL = 'https://graphql.anilist.co'
 
 query_characters = """
@@ -13,9 +12,6 @@ query ($Page: Int, $PerPage: Int) {
       id,
       name {
         full
-      },
-      image {
-        large
       }
     }
   }
@@ -24,7 +20,7 @@ query ($Page: Int, $PerPage: Int) {
 
 query_series = """
 query ($Page: Int, $CharacterId: Int) {
-  Character(id: $CharacterId) {
+  Character(id: $CharacterId) { 
     media(sort: POPULARITY_DESC, page: $Page, perPage: 50) {
       pageInfo {
         hasNextPage
@@ -34,15 +30,14 @@ query ($Page: Int, $CharacterId: Int) {
         title {
           romaji,
           english
-        },
-        type
+        }
       }
     }
   }
 }
 """
 
-async def scrape_top_popular():
+def scrape_top_popular():
     print("How many characters per page (1-50):")
     try:
         count = int(input())
@@ -61,7 +56,7 @@ async def scrape_top_popular():
     choice = input()
     medias = {}
     characters = []
-    for page in range(start, end):
+    for page in range(start, end+1):
         characters_page = requests.post(API_URL, json={'query': query_characters, 'variables': {"Page": page, "PerPage": count}}).json()["data"]["Page"]["characters"]
         print(f"Got {len(characters_page)} characters")
         characters.extend(characters_page)
@@ -75,7 +70,7 @@ async def scrape_top_popular():
                     media_page = media["nodes"]
                     for m in media_page:
                         character["media"].append(m["id"])
-                        data = await connection.execute(f"SELECT * FROM medias:{m['id']}")
+                        data = connection.execute(f"SELECT * FROM media where id={m['id']}")
                         if data:
                             continue
                         if m["id"] not in medias:
@@ -84,26 +79,19 @@ async def scrape_top_popular():
         else:
             pass
     for m in medias.values():
-        if m["title"]["romaji"]:
-            m["title"]["romaji"] = m["title"]["romaji"].replace("'", "\\'")
-        if m["title"]["english"]:
-            m["title"]["english"] = m["title"]["english"].replace("'", "\\'")
-        await connection.execute("INSERT INTO medias (id, title_ro, title_en, type) VALUES (%s, '%s', '%s', '%s');COMMIT;" % (m["id"], m["title"]["romaji"], m["title"]["english"], m["type"]))
-        print(f"Inserted media:{m['title']['romaji']}")
+        # if m["title"]["romaji"]:
+        #     m["title"]["romaji"] = m["title"]["romaji"].replace("'", "\\'")
+        # if m["title"]["english"]:
+        #     m["title"]["english"] = m["title"]["english"].replace("'", "\\'")
+        connection.execute("INSERT INTO media (id, title_ro, title_en) VALUES (%s, %s, %s);", m["id"], m["title"]["romaji"], m["title"]["english"], commit=True)
+        print(f"Inserted media: {m['title']['romaji']}")
     for c in characters:
-        data = await connection.execute(f"SELECT * FROM characters:{m['id']}")
+        data = connection.execute(f"SELECT * FROM characters WHERE id={m['id']}")
         if data:
             continue
-        try:
-            await connection.execute("""INSERT INTO characters {
-                id: %s, 
-                name: '%s', 
-                image: '%s', 
-                media: [%s]
-                };
-                COMMIT;""" % (c["id"], c["name"]["full"].replace("'", "\\'"), c["image"]["large"], "medias:" + ",medias:".join([str(d) for d in c["media"]])))
-        except:
-            print("INSERT INTO characters (id, name, image, media) VALUES (%s, '%s', '%s', [%s]);COMMIT;" % (c["id"], c["name"]["full"].replace("'", "\\'"), c["image"], "medias:" + ", medias:".join([str(d) for d in c["media"]])))
+        connection.execute("INSERT INTO characters (id, name) VALUES (%s, %s);", c["id"], c["name"]["full"], commit=True)
+        for mid in c["media"]:
+            connection.execute("INSERT INTO characters_has_media (characters_id, media_id) VALUES (%s, %s);", c["id"], mid, commit=True)
         print(f"Inserted character:{c['name']['full']}")
 
 
@@ -111,7 +99,7 @@ async def scrape_top_popular():
     # print(medias)
     
 
-async def scrape_db():
+def scrape_db():
     while True:
         print("Choose what to do:\n1. Scrape top popular characters\n2. Exit")
         try:
@@ -120,13 +108,13 @@ async def scrape_db():
             pass
         else:
             if choice == 1:
-                await scrape_top_popular()
+                scrape_top_popular()
             elif choice == 2:
                 return
 
-async def main():
-    data = await connection.execute("INFO FOR DB;")
-    print(data)
+def main():
+    # data = connection.execute("INFO FOR DB;")
+    # print(data)
     while True:
         print("Choose what to do:\n1. Scrape AniList API\n2. Exit")
         try:
@@ -135,9 +123,9 @@ async def main():
             pass
         else:
             if choice == 1:
-                await scrape_db()
+                scrape_db()
             elif choice == 2:
-                await connection.disconnect()
                 return
 
-asyncio.run(main())
+if __name__ == "__main__":
+    main()

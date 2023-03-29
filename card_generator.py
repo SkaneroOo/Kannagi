@@ -6,7 +6,7 @@ import asyncio
 
 
 
-import logger
+from Kannagi import logger
 
 log = logger.Logger(__name__, logger.LogLevel.DEBUG)
 
