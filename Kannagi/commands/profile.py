@@ -25,7 +25,7 @@ class Profile(Cog):
     async def profile(self, interaction: Interaction, user: Member | None = None):
         if not user:
             user = interaction.user
-        data = await self.bot.database.execute(f"SELECT * FROM profiles:{user.id} FETCH fav")
+        data = self.bot.database.execute(f"SELECT daily, color, xp, inv_slots, balance, fav FROM profiles WHERE id={user.id}")
         if not data:
             message = self.translate("user_no_profile", interaction.locale)
             if user == interaction.user:
@@ -33,25 +33,26 @@ class Profile(Cog):
             await interaction.response.send_message(message, ephemeral=True)
             return
         data = data[0]
-        data["daily"] = datetime.fromisoformat(data["daily"])
+        data[0] = datetime.fromisoformat(data[0])
         embed = Embed(title=self.translate("profile_title", interaction.locale).format(user.display_name))
         embed.set_thumbnail(url=user.avatar.url)
-        embed.add_field(name=self.translate("profile_balance", interaction.locale), value=data["balance"])
-        level, xp = self.calculate_level(data["xp"])
+        embed.add_field(name=self.translate("profile_balance", interaction.locale), value=data[4])
+        level, xp = self.calculate_level(data[2])
         embed.add_field(name=self.translate("profile_level", interaction.locale), value=level)
         embed.add_field(name=self.translate("profile_xp", interaction.locale), value=xp)
-        if data["daily"] < datetime.now(timezone.utc):
+        if data[0] < datetime.now(timezone.utc):
             embed.add_field(name=self.translate("profile_daily_time", interaction.locale), value=self.translate("profile_daily_ready", interaction.locale))
         else:
-            embed.add_field(name=self.translate("profile_daily_time", interaction.locale), value=f"<t:{int(data['daily'].timestamp())}:R>")
-        embed.color = data["color"]
-        if data["fav"]:
-            embed.add_field(name=self.translate("profile_fav", interaction.locale), value=data["fav"]["name"], inline=False)
-            embed.set_image(url=f"https://kannagicdn.netlify.app/{data['fav']['id'].split(':')[1]}_6.png")
+            embed.add_field(name=self.translate("profile_daily_time", interaction.locale), value=f"<t:{int(data[0].timestamp())}:R>")
+        embed.color = data[1]
+        if data[5]:
+            fav = self.bot.database.execute("SELECT id, name from characters where id=%s", data[5])
+            embed.add_field(name=self.translate("profile_fav", interaction.locale), value=fav[1], inline=False)
+            embed.set_image(url=f"https://kannagicdn.netlify.app/{fav[0]}_6.png")
         await interaction.response.send_message(embed=embed)
 
     async def menu_profile(self, interaction: Interaction, user: Member):
-        data = await self.bot.database.execute(f"SELECT * FROM profiles:{user.id} FETCH fav")
+        data = self.bot.database.execute(f"SELECT daily, color, xp, inv_slots, balance, fav FROM profiles WHERE id={user.id}")
         if not data:
             message = self.translate("user_no_profile", interaction.locale)
             if user == interaction.user:
@@ -59,25 +60,26 @@ class Profile(Cog):
             await interaction.response.send_message(message, ephemeral=True)
             return
         data = data[0]
-        data["daily"] = datetime.fromisoformat(data["daily"])
+        data[0] = datetime.fromisoformat(data[0])
         embed = Embed(title=self.translate("profile_title", interaction.locale).format(user.display_name))
         embed.set_thumbnail(url=user.avatar.url)
-        embed.add_field(name=self.translate("profile_balance", interaction.locale), value=data["balance"])
-        level, xp = self.calculate_level(data["xp"])
+        embed.add_field(name=self.translate("profile_balance", interaction.locale), value=data[4])
+        level, xp = self.calculate_level(data[2])
         embed.add_field(name=self.translate("profile_level", interaction.locale), value=level)
         embed.add_field(name=self.translate("profile_xp", interaction.locale), value=xp)
-        if data["daily"] < datetime.now(timezone.utc):
+        if data[0] < datetime.now(timezone.utc):
             embed.add_field(name=self.translate("profile_daily_time", interaction.locale), value=self.translate("profile_daily_ready", interaction.locale))
         else:
-            embed.add_field(name=self.translate("profile_daily_time", interaction.locale), value=f"<t:{int(data['daily'].timestamp())}:R>")
-        embed.color = data["color"]
-        if data["fav"]:
-            embed.add_field(name=self.translate("profile_fav", interaction.locale), value=data["fav"]["name"], inline=False)
-            embed.set_image(url=f"https://kannagicdn.netlify.app/{data['fav']['id'].split(':')[1]}_6.png")
+            embed.add_field(name=self.translate("profile_daily_time", interaction.locale), value=f"<t:{int(data[0].timestamp())}:R>")
+        embed.color = data[1]
+        if data[5]:
+            fav = self.bot.database.execute("SELECT id, name from characters where id=%s", data[5])
+            embed.add_field(name=self.translate("profile_fav", interaction.locale), value=fav[1], inline=False)
+            embed.set_image(url=f"https://kannagicdn.netlify.app/{fav[0]}_6.png")
         await interaction.response.send_message(embed=embed)
 
     def calculate_level(self, xp: int) -> tuple[int, int]:
-        return 1, 0 #TODO
+        return 1, xp #TODO
 
         
 async def setup(bot: Kannagi):

@@ -5,6 +5,7 @@ from os import listdir
 
 from .translator import Translator
 from .logger import Logger, LogLevel
+from .Database import Database
 
 GUILD = Object(id=798889494249209907)
 
@@ -14,7 +15,7 @@ class Kannagi(AutoShardedBot):
         super().__init__(intents=intents, command_prefix="->", *args, **kwargs)
         self.logger = Logger(__name__, LogLevel.INFO)
         self.logger.info('Successfully initialised logger')
-        self.database = HTTPClient(dburl, username=dbusername, password=dbpassword, namespace="Kannagi", database="KannagiDB")
+        self.database = Database(dburl, dbusername, dbpassword)
 
         self.translations_path = translations_path
 

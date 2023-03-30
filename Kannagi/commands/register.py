@@ -3,6 +3,7 @@ from discord import Interaction, app_commands
 
 from Kannagi.logger import Logger
 from Kannagi import Kannagi
+from datetime import datetime, timezone, timedelta
 
 class Register(Cog):
 
@@ -14,11 +15,18 @@ class Register(Cog):
 
     @app_commands.command()
     async def register(self, interaction: Interaction):
-        data = await self.bot.database.execute(f"SELECT * FROM profiles:{interaction.user.id}")
+        data = self.bot.database.execute(f"SELECT * FROM profiles WHERE id={interaction.user.id}")
         if data:
             await interaction.response.send_message(self.translate("register_profile_exist", interaction.locale), ephemeral=True)
             return
-        await self.bot.database.execute(f"INSERT INTO profiles (id, balance, xp, fav, color, inventory_slots, summon, daily) VALUES ({interaction.user.id}, 0, 0, null, 6710886, 25, time::now() - 5m, time::group(time::now(), 'day'));")
+        spawn = datetime.now(timezone.utc)-timedelta(minutes=5)
+        spawn.microsecond=0
+        daily = datetime.now(timezone.utc)
+        daily.hour = 0
+        daily.minute = 0
+        daily.second = 0
+        daily.microsecond = 0
+        self.bot.database.execute(f"INSERT INTO profiles (id, balance, xp, fav, color, inventory_slots, spawn, daily) VALUES ({interaction.user.id}, 0, 0, null, 6710886, 25, {spawn.isoformat()}, {daily.isoformat()});")
         await interaction.response.send_message(self.translate("register_success", interaction.locale))
 
 
